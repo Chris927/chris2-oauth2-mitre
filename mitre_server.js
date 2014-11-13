@@ -34,7 +34,7 @@ var getAccessToken = function (query) {
   var response;
   try {
     response = HTTP.post(
-      config.issuer + "/oauth/access_token", {
+      config.issuer + "/token", {
         headers: {
           Accept: 'application/json',
           "User-Agent": userAgent
