@@ -2,7 +2,7 @@ Package.describe({
   name: 'chris2:oauth2-mitre',
   summary: 'Oauth2 flow for MitreID Connect',
   version: '0.0.1',
-  git: ' /* Fill me in! */ '
+  git: 'git@github.com:Chris927/chris2-oauth2-mitre.git'
 });
 
 Package.onUse(function(api) {
