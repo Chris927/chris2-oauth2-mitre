@@ -1,7 +1,7 @@
 Package.describe({
   name: 'chris2:oauth2-mitre',
   summary: 'Oauth2 flow for MitreID Connect',
-  version: '0.0.1',
+  version: '0.0.2',
   git: 'git@github.com:Chris927/chris2-oauth2-mitre.git'
 });
 
@@ -11,6 +11,7 @@ Package.onUse(function(api) {
   api.addFiles('mitre_server.js', 'server');
   api.addFiles('mitre_client.js', 'client');
   api.use('service-configuration', ['client', 'server']);
+  api.imply('service-configuration', 'server');
   api.use('oauth', ['client', 'server']);
   api.use('oauth2', ['client', 'server']);
   api.export('Mitre');
