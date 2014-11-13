@@ -28,7 +28,7 @@ Mitre.requestCredential = function (options, credentialRequestCompleteCallback) 
         '?client_id=' + config.clientId +
         '&scope=' + flatScope +
         '&response_type=token' +
-        '&redirect_uri=' + Meteor.absoluteUrl('_oauth/mitre?close') +
+        '&redirect_uri=' + Meteor.absoluteUrl('_oauth/mitre') +
         '&state=' + credentialToken;
 
   if (options.loginStyle == 'popup') {
