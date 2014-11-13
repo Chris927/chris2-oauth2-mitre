@@ -42,6 +42,7 @@ var getAccessToken = function (query) {
         params: {
           code: query.code,
           client_id: config.clientId,
+          grant_type: 'authorization_code',
           client_secret: OAuth.openSecret(config.secret),
           redirect_uri: OAuth._redirectUri('mitre', config),
           state: query.state
