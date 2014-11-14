@@ -23,13 +23,16 @@ Mitre.requestCredential = function (options, credentialRequestCompleteCallback) 
   var scope = (options && options.requestPermissions) || [];
   var flatScope = _.map(scope, encodeURIComponent).join('+');
 
+  var loginStyle = OAuth._loginStyle('mitre', config, options);
+  var redirectUri = OAuth._redirectUri('mitre', config);
+
   var loginUrl =
         config.issuer + '/authorize' +
         '?client_id=' + config.clientId +
         '&scope=' + flatScope +
-        '&response_type=token' +
-        '&redirect_uri=' + Meteor.absoluteUrl('_oauth/mitre') +
-        '&state=' + credentialToken;
+        '&response_type=code' +
+        '&redirect_uri=' + redirectUri +
+        '&state=' + OAuth._stateParam(loginStyle, credentialToken);
 
   if (options.loginStyle == 'popup') {
     OAuth.showPopup(
@@ -40,10 +43,11 @@ Mitre.requestCredential = function (options, credentialRequestCompleteCallback) 
   } else { // redirect rather than popup
     OAuth.launchLogin({
       loginService: "mitre",
-      loginStyle: 'redirect',
+      loginStyle: loginStyle,
       loginUrl: loginUrl,
       credentialRequestCompleteCallback: credentialRequestCompleteCallback,
-      credentialToken: credentialToken
+      credentialToken: credentialToken,
+      popupOptions: { height: 600 }
     });
   }
 };

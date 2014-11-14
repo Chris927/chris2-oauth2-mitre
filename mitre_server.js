@@ -7,12 +7,12 @@ OAuth.registerService('mitre', 2, null, function(query) {
 
   return {
     serviceData: {
-      id: identity.id,
+      id: identity.sub,
       accessToken: OAuth.sealSecret(accessToken),
       email: identity.email,
-      username: identity.login
+      username: identity.email
     },
-    options: {profile: {name: identity.name}}
+    options: {profile: {name: identity.email}}
   };
 });
 
@@ -62,9 +62,11 @@ var getAccessToken = function (query) {
 var getIdentity = function (accessToken) {
   try {
     return HTTP.get(
-      getConfig() + "/userinfo", {
-        headers: {"User-Agent": userAgent}, // http://developer.github.com/v3/#user-agent-required
-        params: {access_token: accessToken}
+      getConfig().issuer + "/userinfo", {
+        headers: {
+          "User-Agent": userAgent // http://developer.github.com/v3/#user-agent-required
+        },
+        params: { access_token: accessToken }
       }).data;
   } catch (err) {
     throw _.extend(new Error("Failed to fetch identity from Mitre. " + err.message),
