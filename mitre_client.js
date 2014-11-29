@@ -43,7 +43,7 @@ Mitre.requestCredential = function (options, credentialRequestCompleteCallback) 
   } else { // redirect rather than popup
     OAuth.launchLogin({
       loginService: "mitre",
-      loginStyle: loginStyle,
+      loginStyle: 'redirect',
       loginUrl: loginUrl,
       credentialRequestCompleteCallback: credentialRequestCompleteCallback,
       credentialToken: credentialToken,
