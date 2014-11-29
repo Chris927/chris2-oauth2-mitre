@@ -5,14 +5,18 @@ OAuth.registerService('mitre', 2, null, function(query) {
   var accessToken = getAccessToken(query);
   var identity = getIdentity(accessToken);
 
+  var serviceData = {
+    id: identity.sub,
+    accessToken: OAuth.sealSecret(accessToken),
+    email: identity.email,
+    username: identity.preferred_username
+  };
+  for (var property in identity) {
+    serviceData[property] = identity[property]; // anything we received from mitre should be available in serviceData
+  }
   return {
-    serviceData: {
-      id: identity.sub,
-      accessToken: OAuth.sealSecret(accessToken),
-      email: identity.email,
-      username: identity.email
-    },
-    options: {profile: {name: identity.email}}
+    serviceData: serviceData,
+    options: {profile: identity}
   };
 });
 
