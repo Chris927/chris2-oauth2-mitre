@@ -53,7 +53,6 @@ var getToken = function (query) {
           state: query.state
         }
       });
-    console.log('token response', response);
   } catch (err) {
     throw _.extend(new Error("Failed to complete OAuth handshake with Mitre. " + err.message),
                    {response: err.response});
@@ -105,30 +104,13 @@ var getRefreshTokenOfUser = function(userId) {
   return OAuth.openSecret(user.services.mitre.refreshToken);
 }
 
-var getClientToken = function() {
-  var config = getConfig();
-  console.log('getting client_credentials...');
-  var result = HTTP.post(config.issuer + '/authorize', {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    content: 'grant_type=client_credentials' +
-      '&client_id=' + config.clientId +
-      '&client_secret=' + OAuth.openSecret(config.secret)
-  });
-  console.log('getting client_credentials, result', result);
-  return result;
-}
-
 var getNewAccessTokenViaRefresh = function(userId) {
   var config = getConfig();
   try {
-    // var clientToken = getClientToken(); // TODO: unnecessary?
     var body = 'grant_type=refresh_token' +
         '&refresh_token=' + getRefreshTokenOfUser(userId) +
         '&client_id=' + config.clientId +
         '&client_secret=' + OAuth.openSecret(config.secret);
-    console.log('getNewAccessTokenViaRefresh, body', body);
     var response = HTTP.post(
       config.issuer + "/token", {
       headers: {
@@ -138,18 +120,15 @@ var getNewAccessTokenViaRefresh = function(userId) {
       },
       content: body
     });
-    console.log('via refresh, response', response);
-    return response.data && {
-      access_token: response.data.access_token,
-      refresh_token: response.data.refresh_token
-    };
   } catch (err) {
     throw _.extend(new Error("Failed to refresh token from Mitre. " + err.message),
                    {response: err.response});
   }
+  if (!response.data) throw new Error('no data received');
   if (response.data.error) { // if the http response was a json object with an error attribute
     throw new Error("Failed to refresh token from Mitre: " + response.data.error);
   } else {
+    console.log('(MITRE) successfully received new tokens for user ' + userId);
     return {
       access_token: response.data.access_token,
       refresh_token: response.data.refresh_token
@@ -158,7 +137,6 @@ var getNewAccessTokenViaRefresh = function(userId) {
 }
 
 var storeNewAccessToken = function(userId, newAccessToken, newRefreshToken) {
-  console.log('should store new access token', newAccessToken);
   Meteor.users.update({ _id: userId }, {
     $set: {
       'services.mitre.accessToken': newAccessToken,
@@ -173,18 +151,19 @@ Mitre.http.call = function(userId, method, url, options) {
   try {
     result = doCall();
   } catch (e) {
-    console.log('exception while doCall', e);
     if (e.response && e.response.statusCode === 401) {
+      console.log('(MITRE) access token may have expired, attempting refresh...');
       var tokens = getNewAccessTokenViaRefresh(userId);
       if (tokens) {
         storeNewAccessToken(userId, tokens.access_token, tokens.refresh_token);
         return doCall();
       }
+    } else {
+      throw e;
     }
   }
 
   function doCall() {
-    console.log('should call:', userId, method, url, options);
     var extendedOptions = _.clone(options) || {};
     extendedOptions.headers = _.extend(extendedOptions.headers || {}, {
       Authorization: 'Bearer ' + getAccessTokenOfUser(userId)
