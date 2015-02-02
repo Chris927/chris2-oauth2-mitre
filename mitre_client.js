@@ -31,7 +31,7 @@ Mitre.requestCredential = function (options, credentialRequestCompleteCallback) 
         '?client_id=' + config.clientId +
         '&scope=' + flatScope +
         '&response_type=code' +
-        '&redirect_uri=' + redirectUri +
+        '&redirect_uri=' + encodeURIComponent(redirectUri) +
         '&state=' + OAuth._stateParam(loginStyle, credentialToken);
 
   if (options.loginStyle == 'popup') {
