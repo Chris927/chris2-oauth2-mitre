@@ -121,6 +121,8 @@ var getNewAccessTokenViaRefresh = function(userId) {
       content: body
     });
   } catch (err) {
+    // we probably better to "return null", then in the caller remove the (now
+    // certainly invalid) refresh token.
     throw _.extend(new Error("Failed to refresh token from Mitre. " + err.message),
                    {response: err.response});
   }
@@ -157,6 +159,10 @@ Mitre.http.call = function(userId, method, url, options) {
       if (tokens) {
         storeNewAccessToken(userId, tokens.access_token, tokens.refresh_token);
         return doCall();
+      } else {
+        console.log('refresh token seems to have expired / is invalid, deleting it...');
+        storeNewAccessToken(userId, null, null);
+        throw e;
       }
     } else {
       throw e;
