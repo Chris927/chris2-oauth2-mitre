@@ -72,9 +72,9 @@ var getIdentity = function (accessToken) {
     return HTTP.get(
       getConfig().issuer + "/userinfo", {
         headers: {
-          "User-Agent": userAgent // http://developer.github.com/v3/#user-agent-required
-        },
-        params: { access_token: accessToken }
+          "User-Agent": userAgent, // http://developer.github.com/v3/#user-agent-required
+          authorization: 'Bearer ' + accessToken
+        }
       }).data;
   } catch (err) {
     throw _.extend(new Error("Failed to fetch identity from Mitre. " + err.message),
