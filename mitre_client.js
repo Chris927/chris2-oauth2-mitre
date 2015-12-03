@@ -51,3 +51,11 @@ Mitre.requestCredential = function (options, credentialRequestCompleteCallback) 
     });
   }
 };
+
+Mitre.stateParam = function(loginStyle, credentialToken) {
+  return OAuth._stateParam(loginStyle, credentialToken);
+}
+
+Mitre.saveDataForRedirect = function(token) {
+  OAuth.saveDataForRedirect("mitre", token);
+}

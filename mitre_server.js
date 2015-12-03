@@ -2,15 +2,19 @@ Mitre = {};
 
 OAuth.registerService('mitre', 2, null, function(query) {
 
+  console.log('about to getToken', query);
+
   var tokens = getToken(query);
+  console.log('tokens', tokens);
   var identity = getIdentity(tokens.access_token);
+  console.log('identity', identity);
 
   var serviceData = {
     id: identity.sub,
     accessToken: OAuth.sealSecret(tokens.access_token),
     refreshToken: OAuth.sealSecret(tokens.refresh_token),
-    email: identity.email,
-    username: identity.preferred_username
+    email: identity.sub,
+    username: identity.sub
   };
   for (var property in identity) {
     serviceData[property] = identity[property]; // anything we received from mitre should be available in serviceData
@@ -179,3 +183,4 @@ Mitre.http.call = function(userId, method, url, options) {
 
   return result;
 }
+
